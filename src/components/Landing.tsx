@@ -93,7 +93,7 @@ export default function LandingPage() {
         </section>
 
         {/* Artists Section */}
-        <section
+        {/* <section
           id="artists"
           className="py-20 bg-gradient-to-r from-gray-900 to-indigo-900"
         >
@@ -120,7 +120,7 @@ export default function LandingPage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* CTA Section */}
         <section
