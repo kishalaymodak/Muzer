@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MusicIcon, PlayIcon, UsersIcon, RadioIcon } from "lucide-react";
-import Image from "next/image";
+
 import Link from "next/link";
 import AppBar from "./AppBar";
 
