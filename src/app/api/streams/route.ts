@@ -31,8 +31,10 @@ export async function POST(req: NextRequest) {
     const extractedId = data.url.split("?v=")[1];
     console.log("extractedId");
     console.log(extractedId);
-
-    const res = await youtubesearchapi.GetVideoDetails(extractedId);
+    const apikey = process.env.YT_API_KEY;
+    const res = await youtubesearchapi.GetVideoDetails(extractedId, {
+      key: apikey,
+    });
 
     console.log("response");
     console.log(res);
