@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
 
     const extractedId = data.url.split("?v=")[1];
     const res = await youtubesearchapi.GetVideoDetails(extractedId);
+    console.log(res);
+
     const thumbnail = res.thumbnail.thumbnails;
     thumbnail.sort((a: { width: number }, b: { width: number }) =>
       a.width < b.width ? -1 : 1
