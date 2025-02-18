@@ -29,10 +29,19 @@ export async function POST(req: NextRequest) {
     }
 
     const extractedId = data.url.split("?v=")[1];
+    console.log("extractedId");
+    console.log(extractedId);
+
     const res = await youtubesearchapi.GetVideoDetails(extractedId);
+
+    console.log("response");
     console.log(res);
 
     const thumbnail = res.thumbnail.thumbnails;
+    console.log("thumbnails");
+
+    console.log(thumbnail);
+
     thumbnail.sort((a: { width: number }, b: { width: number }) =>
       a.width < b.width ? -1 : 1
     );
