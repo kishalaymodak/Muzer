@@ -37,9 +37,8 @@ export async function POST(req: NextRequest) {
     console.log("response");
     console.log(res);
 
-    const thumbnail = res.thumbnail.thumbnails;
+    const thumbnail = res.thumbnail;
     console.log("thumbnails");
-
     console.log(thumbnail);
 
     thumbnail.sort((a: { width: number }, b: { width: number }) =>
