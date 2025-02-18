@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/db";
-// @ts-expect-error ytchapi api is not Type Compartable
-import youtubesearchapi from "youtube-search-api";
+
 import { getServerSession } from "next-auth";
+import { getVideoDetails } from "@/lib/Ytapi";
 
 const MAX_QUEUE_LEN = 20;
 const YT_REGEX =
@@ -31,21 +31,24 @@ export async function POST(req: NextRequest) {
     const extractedId = data.url.split("?v=")[1];
     console.log("extractedId");
     console.log(extractedId);
-    const apikey = process.env.YT_API_KEY;
-    const res = await youtubesearchapi.GetVideoDetails(extractedId, {
-      key: apikey,
-    });
+    const apikey = process.env.YT_API_KEY || "";
+
+    const res = await getVideoDetails(extractedId, apikey);
+    // const res = await youtubesearchapi.GetVideoDetails(extractedId, {
+    // key: apikey,
+    // });
 
     console.log("response");
-    console.log(res);
 
-    const thumbnail = res.thumbnail.thumbnails;
+    console.log(res.thumbnail);
+
+    const thumbnail = res.thumbnail;
     console.log("thumbnails");
-    console.log(thumbnail);
+    console.log(thumbnail?.high);
 
-    thumbnail.sort((a: { width: number }, b: { width: number }) =>
-      a.width < b.width ? -1 : 1
-    );
+    // thumbnail.sort((a: { width: number }, b: { width: number }) =>
+    //   a.width < b.width ? -1 : 1
+    // );
 
     const existingActiveStream = await prisma.stream.count({
       where: {
@@ -71,13 +74,8 @@ export async function POST(req: NextRequest) {
         extractedId,
         type: "Youtube",
         title: String(res.title) || "",
-        bigImageUrl: String(thumbnail[thumbnail.length - 1].url) ?? "",
-        smallImageUrl:
-          String(
-            thumbnail.length > 1
-              ? thumbnail[thumbnail.length - 2].url
-              : thumbnail[thumbnail.length - 1].url
-          ) || "",
+        bigImageUrl: String(thumbnail?.high) || "",
+        smallImageUrl: String(thumbnail?.medium) || "",
         played: false,
         playedTs: new Date(),
         addedById: data.creatorId,
