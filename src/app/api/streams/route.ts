@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
     }
 
     const extractedId = data.url.split("?v=")[1];
-    console.log("extractedId");
-    console.log(extractedId);
+    // console.log("extractedId");
+    // console.log(extractedId);
     const apikey = process.env.YT_API_KEY || "";
 
     const res = await getVideoDetails(extractedId, apikey);
@@ -38,13 +38,13 @@ export async function POST(req: NextRequest) {
     // key: apikey,
     // });
 
-    console.log("response");
+    // console.log("response");
 
-    console.log(res.thumbnail);
+    // console.log(res.thumbnail);
 
     const thumbnail = res.thumbnail;
-    console.log("thumbnails");
-    console.log(thumbnail?.high);
+    // console.log("thumbnails");
+    // console.log(thumbnail?.high);
 
     // thumbnail.sort((a: { width: number }, b: { width: number }) =>
     //   a.width < b.width ? -1 : 1
