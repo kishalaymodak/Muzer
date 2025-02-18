@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     console.log("response");
     console.log(res);
 
-    const thumbnail = res.thumbnail;
+    const thumbnail = res.thumbnail.thumbnails;
     console.log("thumbnails");
     console.log(thumbnail);
 
