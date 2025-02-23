@@ -6,6 +6,7 @@ import { MusicIcon, PlayIcon, UsersIcon, RadioIcon } from "lucide-react";
 
 import Link from "next/link";
 import AppBar from "./AppBar";
+import { signIn } from "next-auth/react";
 
 export default function LandingPage() {
   const [email, setEmail] = useState("");
@@ -35,6 +36,9 @@ export default function LandingPage() {
             </p>
             <div className="mt-10">
               <Button
+                onClick={() => {
+                  signIn();
+                }}
                 size="lg"
                 className="mr-4 bg-purple-600 text-white hover:bg-purple-700"
               >
