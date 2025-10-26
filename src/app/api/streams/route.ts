@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
   try {
     const data = CreateStreamSchema.parse(await req.json());
     const isYT = data.url.match(YT_REGEX);
+    // console.log(isYT);
+
     if (!isYT) {
       return NextResponse.json(
         {
@@ -28,7 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const extractedId = data.url.split("?v=")[1];
+    const extractedId = isYT[1];
     // console.log("extractedId");
     // console.log(extractedId);
     const apikey = process.env.YT_API_KEY || "";
