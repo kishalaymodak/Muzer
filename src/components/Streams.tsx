@@ -10,7 +10,8 @@ import AppBar from "@/components/AppBar";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import { YT_REGEX } from "@/lib/regex";
 import YouTubePlayer from "youtube-player";
-
+// @ts-expect-error: CSS module side-effect import without type declarations
+import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 interface streams {
   upvots: Array<{
     id: string;
@@ -49,6 +50,12 @@ export default function Streams({
   const [playNextLoader, setPlayNextLoader] = useState(false);
   const videoPlayerRef = useRef<HTMLDivElement>();
   // console.log(creatorId);
+
+  const Window = typeof window !== "undefined" ? window : null;
+
+  const windowVal =
+    Window?.matchMedia?.("(min-width: 768px)")?.matches ?? false;
+  console.log(windowVal);
 
   async function refreshStreams() {
     const res = await fetch(`/api/streams/?creatorId=${creatorId}`, {
@@ -220,8 +227,8 @@ export default function Streams({
       <div className="flex justify-center">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-5 w-screen max-w-72 sm:max-w-lg md:max-w-screen-xl pt-8">
           <div className="col-span-3">
-            {!window.matchMedia("(min-width: 768px)").matches && (
-              <div className="md:hidden">
+            {!windowVal && (
+              <div className="md:hidden pb-4">
                 <div className="space-y-4">
                   <h2 className="text-2xl font-bold text-white">Now Playing</h2>
                   <Card className="bg-gray-900 border-gray-800">
@@ -315,7 +322,7 @@ export default function Streams({
             </div>
           </div>
           <div className="col-span-2">
-            <div className="max-w-4xl mx-auto p-4 space-y-6 w-full">
+            <div className="max-w-4xl mx-auto sm:p-4 space-y-6 w-full">
               <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold text-white">Add a song</h1>
                 <Button
@@ -343,7 +350,7 @@ export default function Streams({
               </form>
               {inputLink && inputLink.match(YT_REGEX) && !loading && (
                 <Card className="bg-gray-900 border-gray-800">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2 sm:p-4">
                     <LiteYouTubeEmbed
                       title=""
                       id={inputLink.match(YT_REGEX)?.[1] ?? ""}
@@ -351,7 +358,7 @@ export default function Streams({
                   </CardContent>
                 </Card>
               )}
-              {window.matchMedia("(min-width: 768px)").matches && (
+              {windowVal && (
                 <div className="hidden md:block">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold text-white">
