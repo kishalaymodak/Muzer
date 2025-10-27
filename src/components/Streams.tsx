@@ -10,7 +10,7 @@ import AppBar from "@/components/AppBar";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import { YT_REGEX } from "@/lib/regex";
 import YouTubePlayer from "youtube-player";
-// @ts-expect-error: CSS module side-effect import without type declarations
+
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 interface streams {
   upvots: Array<{
