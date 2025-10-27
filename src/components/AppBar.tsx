@@ -15,9 +15,11 @@ function AppBar() {
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
           <MusicIcon className="h-6 w-6 text-purple-400" />
-          <span className="text-2xl font-bold text-purple-400">Muzer</span>
+          <span className="text-lg sm:text-2xl font-bold text-purple-400">
+            Muzer
+          </span>
         </Link>
-        <span className="text-2xl font-bold text-purple-400">
+        <span className="hidden sm:block sm:text-2xl font-bold text-purple-400">
           {session.data?.user?.name}
         </span>
         <div className=" flex gap-3">
@@ -39,7 +41,7 @@ function AppBar() {
               onClick={() => {
                 signOut();
               }}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-purple-600 hover:bg-purple-700 text-white "
             >
               Log Out
             </Button>

@@ -8,7 +8,6 @@ import { ChevronUp, ChevronDown, Play, Share2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import AppBar from "@/components/AppBar";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
-import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import { YT_REGEX } from "@/lib/regex";
 import YouTubePlayer from "youtube-player";
 
@@ -219,51 +218,53 @@ export default function Streams({
     <div className="flex flex-col min-h-screen bg-[rgb(10,10,10)] text-gray-200">
       <AppBar />
       <div className="flex justify-center">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-5 w-screen max-w-screen-xl pt-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-5 w-screen max-w-72 sm:max-w-lg md:max-w-screen-xl pt-8">
           <div className="col-span-3">
-            <div className="md:hidden">
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white">Now Playing</h2>
-                <Card className="bg-gray-900 border-gray-800">
-                  <CardContent className="p-4">
-                    {currentVideo ? (
-                      <div>
-                        {playVideo ? (
-                          //@ts-expect-error video ref
+            {!window.matchMedia("(min-width: 768px)").matches && (
+              <div className="md:hidden">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold text-white">Now Playing</h2>
+                  <Card className="bg-gray-900 border-gray-800">
+                    <CardContent className="p-2">
+                      {currentVideo ? (
+                        <div>
+                          {playVideo ? (
+                            //@ts-expect-error video ref
 
-                          <div ref={videoPlayerRef} className="w-full" />
-                        ) : (
-                          <>
-                            <img
-                              src={currentVideo.bigImageUrl}
-                              className="w-full h-72 object-cover rounded"
-                              alt={currentVideo.title}
-                            />
-                            <p className="mt-2 text-center font-semibold text-white">
-                              {currentVideo.title}
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-center py-8 text-gray-400">
-                        No video playing
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-                {playVideo && (
-                  <Button
-                    disabled={playNextLoader}
-                    onClick={playNext}
-                    className="w-full bg-purple-700 hover:bg-purple-800 text-white"
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    {playNextLoader ? "Loading..." : "Play next"}
-                  </Button>
-                )}
+                            <div ref={videoPlayerRef} className="h-64 w-full" />
+                          ) : (
+                            <>
+                              <img
+                                src={currentVideo.bigImageUrl}
+                                className="w-full h-64 object-cover rounded"
+                                alt={currentVideo.title}
+                              />
+                              <p className="mt-2 text-center font-semibold text-white">
+                                {currentVideo.title}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-center py-8 text-gray-400">
+                          No video playing
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                  {playVideo && (
+                    <Button
+                      disabled={playNextLoader}
+                      onClick={playNext}
+                      className="w-full bg-purple-700 hover:bg-purple-800 text-white"
+                    >
+                      <Play className="mr-2 h-4 w-4" />
+                      {playNextLoader ? "Loading..." : "Play next"}
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-white">Upcoming Songs</h2>
               {queue.length === 0 && (
@@ -350,50 +351,54 @@ export default function Streams({
                   </CardContent>
                 </Card>
               )}
-              <div className="hidden md:block">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-white">Now Playing</h2>
-                  <Card className="bg-gray-900 border-gray-800">
-                    <CardContent className="p-4">
-                      {currentVideo ? (
-                        <div>
-                          {playVideo ? (
-                            //@ts-expect-error video ref
+              {window.matchMedia("(min-width: 768px)").matches && (
+                <div className="hidden md:block">
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-bold text-white">
+                      Now Playing
+                    </h2>
+                    <Card className="bg-gray-900 border-gray-800">
+                      <CardContent className="p-4">
+                        {currentVideo ? (
+                          <div>
+                            {playVideo ? (
+                              //@ts-expect-error video ref
 
-                            <div ref={videoPlayerRef} className="w-full" />
-                          ) : (
-                            <>
-                              <img
-                                src={currentVideo.bigImageUrl}
-                                className="w-full h-72 object-cover rounded"
-                                alt={currentVideo.title}
-                              />
+                              <div ref={videoPlayerRef} className="w-full" />
+                            ) : (
+                              <>
+                                <img
+                                  src={currentVideo.bigImageUrl}
+                                  className="w-full h-72 object-cover rounded"
+                                  alt={currentVideo.title}
+                                />
 
-                              <p className="mt-2 text-center font-semibold text-white">
-                                {currentVideo.title}
-                              </p>
-                            </>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-center py-8 text-gray-400">
-                          No video playing
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                  {playVideo && (
-                    <Button
-                      disabled={playNextLoader}
-                      onClick={playNext}
-                      className="w-full bg-purple-700 hover:bg-purple-800 text-white"
-                    >
-                      <Play className="mr-2 h-4 w-4" />
-                      {playNextLoader ? "Loading..." : "Play next"}
-                    </Button>
-                  )}
+                                <p className="mt-2 text-center font-semibold text-white">
+                                  {currentVideo.title}
+                                </p>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-center py-8 text-gray-400">
+                            No video playing
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                    {playVideo && (
+                      <Button
+                        disabled={playNextLoader}
+                        onClick={playNext}
+                        className="w-full bg-purple-700 hover:bg-purple-800 text-white"
+                      >
+                        <Play className="mr-2 h-4 w-4" />
+                        {playNextLoader ? "Loading..." : "Play next"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
