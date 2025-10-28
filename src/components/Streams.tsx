@@ -149,7 +149,9 @@ export default function Streams({
     setWindowVal(mediaQuery.matches);
 
     // Listen for changes
-    const handleChange = (e: any) => setWindowVal(e.matches);
+    const handleChange = (e: {
+      matches: boolean | ((prevState: boolean) => boolean);
+    }) => setWindowVal(e.matches);
 
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener("change", handleChange);

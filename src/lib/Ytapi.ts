@@ -1,5 +1,31 @@
 "use server";
 
+interface Thumbnail {
+  url: string;
+}
+
+interface VideoSnippet {
+  title: string;
+  thumbnails: Record<string, Thumbnail>;
+}
+
+interface VideoItem {
+  snippet: VideoSnippet;
+}
+
+interface SearchItem {
+  id: { videoId: string };
+  snippet: VideoSnippet;
+}
+
+interface VideoDetailsResponse {
+  items: VideoItem[];
+}
+
+interface SearchResponse {
+  items: SearchItem[];
+}
+
 export async function getVideoDetails(videoId: string, apiKey: string) {
   const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
   try {
@@ -7,7 +33,7 @@ export async function getVideoDetails(videoId: string, apiKey: string) {
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
-    const data = await response.json();
+    const data: VideoDetailsResponse = await response.json();
 
     if (data.items && data.items.length > 0) {
       const video = data.items[0].snippet;
@@ -41,9 +67,9 @@ export async function searchVideos(query: string) {
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
-    const data = await response.json();
+    const data: SearchResponse = await response.json();
 
-    const results = data.items.map((item: any) => {
+    const results = data.items.map((item: SearchItem) => {
       const videoId = item.id.videoId;
       const snippet = item.snippet;
       const thumbnails = snippet.thumbnails;
