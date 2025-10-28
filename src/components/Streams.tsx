@@ -10,8 +10,10 @@ import AppBar from "@/components/AppBar";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import { YT_REGEX } from "@/lib/regex";
 import YouTubePlayer from "youtube-player";
+import { useDebouncedCallback } from "use-debounce";
 
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
+import { searchVideos } from "@/lib/Ytapi";
 interface streams {
   upvots: Array<{
     id: string;
@@ -46,16 +48,14 @@ export default function Streams({
   const [inputLink, setInputLink] = useState("");
   const [queue, setQueue] = useState<Video[]>([]);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
+  const [searchResults, setSearchResults] = useState<
+    Array<{ id: string; title: string; thumbnail: Record<string, string> }>
+  >([]);
   const [loading, setLoading] = useState(false);
   const [playNextLoader, setPlayNextLoader] = useState(false);
   const videoPlayerRef = useRef<HTMLDivElement>();
   // console.log(creatorId);
-
-  const Window = typeof window !== "undefined" ? window : null;
-
-  const windowVal =
-    Window?.matchMedia?.("(min-width: 768px)")?.matches ?? false;
-  console.log(windowVal);
+  const [windowVal, setWindowVal] = useState(false);
 
   async function refreshStreams() {
     const res = await fetch(`/api/streams/?creatorId=${creatorId}`, {
@@ -64,7 +64,7 @@ export default function Streams({
     // console.log("stream data");
 
     const json = await res.json();
-    console.log(json.streams);
+    // console.log(json.streams);
 
     setQueue(
       json.streams.sort((a: streams, b: streams) =>
@@ -84,14 +84,93 @@ export default function Streams({
     });
   }
 
+  const handleSearch = useDebouncedCallback(async (input: string) => {
+    if (!input || input.match(YT_REGEX) || input.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const res = await searchVideos(input);
+      console.log(res);
+
+      if (Array.isArray(res)) {
+        setSearchResults(res);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (e) {
+      setSearchResults([]);
+    }
+  }, 300);
+
+  // cleanup debounced callback on unmount
+
+  // const addSearchedVideo = async (videoId: string) => {
+  //   setLoading(true);
+  //   const url = `https://www.youtube.com/watch?v=${videoId}`;
+  //   try {
+  //     const res = await fetch("/api/streams/", {
+  //       method: "POST",
+  //       body: JSON.stringify({
+  //         creatorId,
+  //         url,
+  //       }),
+  //     });
+
+  //     const newVideo = await res.json();
+  //     setQueue((q) => [...q, newVideo]);
+  //     setInputLink("");
+  //     setSearchResults([]);
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to add video to queue",
+  //     });
+  //   }
+  //   setLoading(false);
+  // };
+
   useEffect(() => {
     refreshStreams();
     const interval = setInterval(() => {
       refreshStreams();
     }, REFRESH_INTERVAL_MS);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      handleSearch.cancel?.();
+    };
   }, []);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+
+    // Set initial value
+    setWindowVal(mediaQuery.matches);
+
+    // Listen for changes
+    const handleChange = (e: any) => setWindowVal(e.matches);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange);
+    } else {
+      mediaQuery.addListener(handleChange); // Fallback for older browsers
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener("change", handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     // cancel if available
+  //     handleSearch.cancel?.();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (!videoPlayerRef.current || !currentVideo) {
@@ -335,9 +414,12 @@ export default function Streams({
               <form onSubmit={handleSubmit} className="space-y-2">
                 <Input
                   type="text"
-                  placeholder="Paste YouTube link here"
+                  placeholder="Paste YouTube link here or search"
                   value={inputLink}
-                  onChange={(e) => setInputLink(e.target.value)}
+                  onChange={(e) => {
+                    setInputLink(e.target.value);
+                    handleSearch(e.target.value);
+                  }}
                   className="bg-gray-900 text-white border-gray-700 placeholder-gray-500"
                 />
                 <Button
@@ -347,6 +429,47 @@ export default function Streams({
                 >
                   {loading ? "Loading..." : "Add to Queue"}
                 </Button>
+
+                {searchResults.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-md font-semibold text-white">
+                      Search results
+                    </h3>
+                    {searchResults.map((r) => {
+                      const thumb =
+                        r.thumbnail?.medium ||
+                        r.thumbnail?.default ||
+                        Object.values(r.thumbnail || {})[0];
+                      return (
+                        <Card
+                          key={r.id}
+                          className="bg-gray-900 border-gray-800"
+                        >
+                          <CardContent className="p-2 flex items-center space-x-3">
+                            <img
+                              src={thumb as string}
+                              alt={r.title}
+                              className="w-20 h-12 object-cover rounded"
+                            />
+                            <div className="flex-grow">
+                              <p className="text-sm text-white font-medium">
+                                {r.title}
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              type="submit"
+                              disabled={loading}
+                              className="bg-purple-700 hover:bg-purple-800 text-white"
+                            >
+                              Add
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
               </form>
               {inputLink && inputLink.match(YT_REGEX) && !loading && (
                 <Card className="bg-gray-900 border-gray-800">
